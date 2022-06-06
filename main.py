@@ -3,11 +3,21 @@ import imageProcessing.processing as prc
 
 if __name__ == "__main__":
 
-    TEST_IMAGE = "dataset/test/paper/testpaper01-00.png"
+    TEST_IMAGE_1 = "dataset/test/paper/testpaper01-00.png"
+    TEST_IMAGE_2 = "dataset/test/paper/testpaper03-15.png"
+
     RED = 0
     GREEN = 1
     BLUE = 2
 
-    #eda.create_rgb_channels_histogram(TEST_IMAGE)
-    #eda.create_basic_histogram(TEST_IMAGE,BLUE)
-    prc.runAllProccesingTypes(TEST_IMAGE)
+    ### EDA
+
+    #eda.create_rgb_channels_histogram(TEST_IMAGE_1)
+    #eda.create_basic_histogram(TEST_IMAGE_1,BLUE)
+    #distances =eda.compare_images_histograms(TEST_IMAGE_1,TEST_IMAGE_2)
+    #print(distances)
+
+    ### Transformations
+
+    ## Thresholding and what else?
+    #prc.runAllProccesingTypes(TEST_IMAGE_1)
