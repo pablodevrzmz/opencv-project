@@ -1,5 +1,5 @@
 import eda.eda as eda
-import imageProcessing.processing as prc
+import image_processing.processing as prc
 
 if __name__ == "__main__":
 
