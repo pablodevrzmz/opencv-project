@@ -3,6 +3,7 @@
 
 import numpy as np
 import cv2 as cv
+import numpy as np
 
 def showImage(img, windowName):
     cv.imshow(windowName, img)
@@ -54,3 +55,19 @@ def runAllProccesingTypes(imagePath):
     showImage(thresholdImage(imagePath, color=0 ,adaptativeThreshMethod=cv.ADAPTIVE_THRESH_MEAN_C, blockSize=11, C=2), "Adaptive Gaussian Threshold")
     cv.waitKey(0) #Press any key to close all images' windows
     cv.destroyAllWindows()
+
+
+def apply_morphology(image_path,method, kernel=(np.ones((5,5), np.uint8)), iterations=1, show=True):
+
+    img = cv.imread(image_path)
+
+    if method == "EROSION":
+        output_image = cv.cv2.erode(img, kernel, iterations)  
+    elif method == "DILATION": 
+        output_image = cv.cv2.dilate(img, kernel, iterations) 
+    
+    if show:
+        showImage(output_image,method)
+        cv.waitKey(0)
+    
+    return output_image

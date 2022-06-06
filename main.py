@@ -21,3 +21,7 @@ if __name__ == "__main__":
 
     ## Thresholding and what else?
     #prc.runAllProccesingTypes(TEST_IMAGE_1)
+
+    ## Morphology
+    #prc.apply_morphology(TEST_IMAGE_1,"EROSION")
+    #prc.apply_morphology(TEST_IMAGE_1,"DILATION")
