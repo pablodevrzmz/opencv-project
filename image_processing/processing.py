@@ -71,3 +71,30 @@ def apply_morphology(image_path,method, kernel=(np.ones((5,5), np.uint8)), itera
         cv.waitKey(0)
     
     return output_image
+
+def apply_blur(image_path,method, show=True):
+    
+    img = cv.imread(image_path)
+
+    if method == "2D_CONVOLUTION":
+        kernel = np.ones((5,5),np.float32)/25
+        output_image = cv.filter2D(img,-1,kernel)
+
+    elif method == "BLUR":
+        output_image = cv.blur(img,(5,5))
+
+    elif method == "GAUS_BLUR":
+        output_image = cv.GaussianBlur(img,(5,5),0)
+
+    elif method == "MEDIAN_BLUR":
+        output_image = cv.medianBlur(img,5)
+
+    elif method == "BILATERAL":
+        output_image = cv.bilateralFilter(img,9,75,75)
+
+    if show:
+        showImage(output_image,method)
+        cv.waitKey(0)
+
+    return output_image
+

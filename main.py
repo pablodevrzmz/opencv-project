@@ -25,3 +25,10 @@ if __name__ == "__main__":
     ## Morphology
     #prc.apply_morphology(TEST_IMAGE_1,"EROSION")
     #prc.apply_morphology(TEST_IMAGE_1,"DILATION")
+
+    ## Blurring
+    prc.apply_blur(TEST_IMAGE_1,"2D_CONVOLUTION")
+    prc.apply_blur(TEST_IMAGE_1,"BLUR")
+    prc.apply_blur(TEST_IMAGE_1,"GAUS_BLUR")
+    prc.apply_blur(TEST_IMAGE_1,"MEDIAN_BLUR")
+    prc.apply_blur(TEST_IMAGE_1,"BILATERAL")
