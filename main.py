@@ -1,15 +1,46 @@
 import eda.eda as eda
 import image_processing.processing as prc
+import model.modelCreation as mdl
+import glob
+import os
+
+def loadDatasets():
+    datasetChunk = ['test','train','validation']
+    types = ['rock', 'paper', 'scissors']
+    processedDatasets = ['datasets/Outline', 'datasets/InvertedColors', 'datasets/Contour']
+
+    unprocessedDataset= 'datasets/Unprocessed'
+    ##NOTE: This is creating a unwanted folder inside the validation directories.
+    for i in datasetChunk:
+        for j in types:
+            subdir='/'+i+'/'+j+'/' if (i != 'validation') else '/'+i+'/'
+            unprocessedImages = glob.glob(unprocessedDataset+subdir+'*.png')
+            for k in unprocessedImages:
+                if(not os.path.exists(k.replace('Unprocessed', 'Contour'))):
+                    if (not os.path.exists('datasets/Contour/'+i+'/'+j)):
+                        os.makedirs('datasets/Contour/'+i+'/'+j)
+                    imageContour = prc.countourImage(k)
+                    prc.saveImage(k.replace('Unprocessed', 'Contour'), imageContour)
+                if(not os.path.exists(k.replace('Unprocessed', 'Outline'))):
+                    if (not os.path.exists('datasets/Outline/'+i+'/'+j)):
+                        os.makedirs('datasets/Outline/'+i+'/'+j)
+                    imageOutline = prc.outlineImage(k)
+                    prc.saveImage(k.replace('Unprocessed', 'Outline'), imageOutline)
+                if(not os.path.exists(k.replace('Unprocessed', 'InvertedColors'))):
+                    if (not os.path.exists('datasets/InvertedColors/'+i+'/'+j)):
+                        os.makedirs('datasets/InvertedColors/'+i+'/'+j)
+                    imageInverted = prc.invertImageColors(k) 
+                    prc.saveImage(k.replace('Unprocessed', 'InvertedColors'), imageInverted)
 
 if __name__ == "__main__":
 
-    TEST_IMAGE_1 = "dataset/test/paper/testpaper01-00.png"
-    TEST_IMAGE_2 = "dataset/test/paper/testpaper03-15.png"
-
+    TEST_IMAGE_1 = "datasets/Unprocessed/test/paper/testpaper01-00.png"
+    TEST_IMAGE_2 = "datasets/Unprocessed/test/paper/testpaper03-15.png"
     RED = 0
     GREEN = 1
     BLUE = 2
 
+    
     ### EDA
 
     #eda.create_rgb_channels_histogram(TEST_IMAGE_1)
@@ -22,13 +53,16 @@ if __name__ == "__main__":
     ## Thresholding and what else?
     #prc.runAllProccesingTypes(TEST_IMAGE_1)
 
+    #loadDatasets()
     ## Morphology
     #prc.apply_morphology(TEST_IMAGE_1,"EROSION")
     #prc.apply_morphology(TEST_IMAGE_1,"DILATION")
 
     ## Blurring
-    prc.apply_blur(TEST_IMAGE_1,"2D_CONVOLUTION")
-    prc.apply_blur(TEST_IMAGE_1,"BLUR")
-    prc.apply_blur(TEST_IMAGE_1,"GAUS_BLUR")
-    prc.apply_blur(TEST_IMAGE_1,"MEDIAN_BLUR")
-    prc.apply_blur(TEST_IMAGE_1,"BILATERAL")
+    #prc.apply_blur(TEST_IMAGE_1,"2D_CONVOLUTION")
+    #prc.apply_blur(TEST_IMAGE_1,"BLUR")
+    #prc.apply_blur(TEST_IMAGE_1,"GAUS_BLUR")
+    #prc.apply_blur(TEST_IMAGE_1,"MEDIAN_BLUR")
+    #prc.apply_blur(TEST_IMAGE_1,"BILATERAL")
+
+    mdl.createModel()

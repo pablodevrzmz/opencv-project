@@ -41,18 +41,27 @@ def thresholdImage(imagePath, color=None, thresholdValue=127, maxValue=255, thre
         _, thresh = cv.threshold(img, thresholdValue, maxValue, threshMethod+cv.THRESH_OTSU if useOtsu else threshMethod)
     return thresh
 
+def countourImage(imagePath):
+    return thresholdImage(imagePath, threshMethod=cv.THRESH_BINARY_INV, useOtsu=True)
+
+def outlineImage(imagePath):
+    return thresholdImage(imagePath, color=0 ,adaptativeThreshMethod=cv.ADAPTIVE_THRESH_MEAN_C, blockSize=11, C=2)
+
+def saveImage(imagePath, imageData):
+    cv.imwrite(imagePath, imageData)
+
 
 def runAllProccesingTypes(imagePath):
     showImage(cv.imread(imagePath), "Original")
     showImage(invertImageColors(imagePath), "Inverted")
     showImage(thresholdImage(imagePath), "Binary Threshold")
-    showImage(thresholdImage(imagePath, threshMethod=cv.THRESH_BINARY_INV, useOtsu=True), "Binary Inverted Otsu Threshold")#This gets the contour, though it requires the colors to be in a greyscale
-    showImage(thresholdImage(imagePath, color=cv.IMREAD_GRAYSCALE, threshMethod=cv.THRESH_BINARY_INV), "Binary Inverted GreyScale Threshold") 
+    showImage(thresholdImage(imagePath, threshMethod=cv.THRESH_BINARY_INV, useOtsu=True), "Binary Inverted Otsu Threshold")#Contour
+    showImage(thresholdImage(imagePath, color=cv.IMREAD_GRAYSCALE, threshMethod=cv.THRESH_BINARY_INV), "Binary Inverted GreyScale Threshold") #
     showImage(thresholdImage(imagePath, threshMethod=cv.THRESH_BINARY_INV), "Binary Inverted Threshold") 
     showImage(thresholdImage(imagePath, threshMethod=cv.THRESH_TRUNC), "Truncated Threshold")
     showImage(thresholdImage(imagePath, threshMethod=cv.THRESH_TOZERO), "ToZero Threshold")
     showImage(thresholdImage(imagePath, threshMethod=cv.THRESH_TOZERO_INV), "ToZero Inverted Threshold")
-    showImage(thresholdImage(imagePath, color=0 ,adaptativeThreshMethod=cv.ADAPTIVE_THRESH_MEAN_C, blockSize=11, C=2), "Adaptive Gaussian Threshold")
+    showImage(thresholdImage(imagePath, color=0 ,adaptativeThreshMethod=cv.ADAPTIVE_THRESH_MEAN_C, blockSize=11, C=2), "Adaptive Gaussian Threshold") #Outline
     cv.waitKey(0) #Press any key to close all images' windows
     cv.destroyAllWindows()
 
@@ -97,4 +106,5 @@ def apply_blur(image_path,method, show=True):
         cv.waitKey(0)
 
     return output_image
+
 
