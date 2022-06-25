@@ -1,6 +1,7 @@
 import eda.eda as eda
 import image_processing.processing as prc
 import model.modelCreation as mdl
+from tensorflow.keras.models import load_model
 import glob
 import os
 
@@ -65,4 +66,6 @@ if __name__ == "__main__":
     #prc.apply_blur(TEST_IMAGE_1,"MEDIAN_BLUR")
     #prc.apply_blur(TEST_IMAGE_1,"BILATERAL")
 
-    mdl.createModel()
+    #model = mdl.createModel()
+    model = load_model('Unprocessed0')
+    mdl.evaluateModel(model)

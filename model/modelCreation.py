@@ -4,8 +4,8 @@ import glob
 import os
 import matplotlib.pyplot as plt
 from tensorflow.keras.applications import DenseNet121 as DN
-from tensorflow.keras import Sequential, metrics
-from tensorflow.keras.models import Model, load_model
+from tensorflow.keras import Sequential
+from sklearn import metrics
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
 from tensorflow.keras.layers import Dense, Conv2D, MaxPooling2D, GlobalAveragePooling2D, Flatten, Dropout, BatchNormalization
@@ -57,40 +57,38 @@ def loadDataset(processingMethod, dataChunkToLoad):
 
 def createModel(processingMethod='Unprocessed', model_index=0):
     X_train, y_train = loadDataset(processingMethod, 'train')
-    X_test, y_test = loadDataset(processingMethod, 'test')
-
     model_name=processingMethod+str(model_index)
-    #Creating the DenseNet model
-    #References: https://www.pluralsight.com/guides/introduction-to-densenet-with-tensorflow
-    #            https://bouzouitina-hamdi.medium.com/transfer-learning-with-keras-using-densenet121-fffc6bb0c233
-    denseArchitecture = DN(weights="imagenet", include_top=False, input_shape=(300, 300, 3))
-    #https://www.tensorflow.org/api_docs/python/tf/keras/layers/Layer
-    for layer in denseArchitecture.layers[:121]:
-        layer.trainable = False #we are using imagenet, so this layers shouldn't be trainable
-
-    #input = denseArchitecture.input
-    #added_layers = MaxPooling2D()(denseArchitecture.output)
-    #added_layers = BatchNormalization()(added_layers)
-    #added_layers = Dense(512, activation='relu')(added_layers)
-    #added_layers = Dropout(0.33)(added_layers)
-    #added_layers = Flatten()(added_layers)
-    #added_layers = Dense(64, activation='relu')(added_layers)
-    #added_layers = Dense(3, activation='softmax')(added_layers)
-    #model = Model(input, added_layers)
+    #Model Definition
     model = Sequential() #DenseNet is a sequential architecture
-    model.add(denseArchitecture)
-    model.add(MaxPooling2D())
-    model.add(BatchNormalization())
-    model.add(Dropout(0.33))
-    #Activations: https://www.tensorflow.org/api_docs/python/tf/keras/activations
+    model.add(Conv2D(32, (3,3), activation='relu', input_shape=(300,300,3)))
+    model.add(MaxPooling2D(2,2))
+    model.add(Conv2D(64, (3,3), activation='relu'))
+    model.add(MaxPooling2D(2,2))
+    model.add(Conv2D(128, (3,3), activation='relu'))
+    model.add(MaxPooling2D(2,2))
+    model.add(Conv2D(128, (3,3), activation='relu'))
+    model.add(MaxPooling2D(2,2))
     model.add(Flatten())
-    model.add(Dense(512, activation="relu"))
+    model.add(Dense(512, activation='relu'))
     model.add(Dense(3, activation="softmax"))
-    #Reference: https://machinelearningmastery.com/adam-optimization-algorithm-for-deep-learning/
-    model.compile(optimizer=Adam(learning_rate=0.001), metrics=['accuracy', metrics.Precision(name='precision'), metrics.Recall(name='recall')], loss='categorical_crossentropy')
-    model_metrics = model.fit(x=X_train, y=y_train, epochs=10, validation_data=(X_test, y_test))
+    model.compile(optimizer='adam', metrics=['accuracy'], loss='categorical_crossentropy')
+
+    
+    model_metrics = model.fit(x=X_train, y=y_train, epochs=10, validation_split=.2)
     model.save(model_name)
-    model.evaluate(x=X_test, y=y_test)
-    plt.plot(model_metrics.history['accuracy'], color='blue', label='train')
-    plt.plot(model_metrics.history['val_accuracy'], color='orange', label='test')
-    plt.show()
+    return model
+
+def evaluateModel(model, processingMethod='Unprocessed'):
+    X_test, y_test = loadDataset(processingMethod, 'test')
+    predictions = model.predict(X_test)
+    correctly_predicted_images=0
+    for i in range(0, len(predictions)):
+        #getting the predicted class
+        predictions[i][0] = 1 if predictions[i][0]>=0.5 else 0
+        predictions[i][1] = 1 if predictions[i][1]>=0.5 else 0
+        predictions[i][2] = 1 if predictions[i][2]>=0.5 else 0
+        if(predictions[i][0] == y_test[i][0] and predictions[i][1] == y_test[i][1] and predictions[i][2] == y_test[i][2]):
+            correctly_predicted_images+=1
+    print('Correctly predicted images from the test set: '+str(correctly_predicted_images))
+    print('Wrongfully predicted images from test set: '+ str(len(y_test)-correctly_predicted_images))
+    print('Accuracy: ' + str(correctly_predicted_images/len(y_test)))
