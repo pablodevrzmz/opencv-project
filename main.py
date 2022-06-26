@@ -4,6 +4,8 @@ import model.modelCreation as mdl
 import glob
 import os
 
+
+#This method is pretty ugly
 def loadDatasets():
     datasetChunk = ['test','train','validation']
     types = ['rock', 'paper', 'scissors']

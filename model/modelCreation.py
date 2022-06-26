@@ -13,6 +13,7 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
 from tensorflow.keras.layers import Dense, Conv2D, MaxPooling2D, GlobalAveragePooling2D, Flatten, Dropout, BatchNormalization
+from keras.utils.vis_utils import plot_model
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
@@ -152,7 +153,7 @@ def runModels():
         models_f1.append(model_stats[2])
         models_recall.append(model_stats[3])
         models_precision.append(model_stats[4])
-
+    plot_model(model, to_file='Extracted_Data/model_architecture.png', show_shapes=True)
     #Creating the dataframe to store models' metrics
     statistics = pd.DataFrame(processing_methods, columns=['Processing_Method'])
     statistics['ROC'] = models_ROC
