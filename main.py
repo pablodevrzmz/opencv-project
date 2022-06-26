@@ -1,7 +1,6 @@
 import eda.eda as eda
 import image_processing.processing as prc
 import model.modelCreation as mdl
-from tensorflow.keras.models import load_model
 import glob
 import os
 
@@ -65,6 +64,7 @@ if __name__ == "__main__":
     #prc.runAllProccesingTypes(TEST_IMAGE_1)
 
     loadDatasets()
+    mdl.runModels()
     ## Morphology
     #prc.apply_morphology(TEST_IMAGE_1,"EROSION")
     #prc.apply_morphology(TEST_IMAGE_1,"DILATION")
@@ -75,16 +75,4 @@ if __name__ == "__main__":
     #prc.apply_blur(TEST_IMAGE_1,"GAUS_BLUR")
     #prc.apply_blur(TEST_IMAGE_1,"MEDIAN_BLUR")
     #prc.apply_blur(TEST_IMAGE_1,"BILATERAL")
-    processing_methods=['Unprocessed','InvertedColors','Outline','Contour', 'Blurred_Outline', 'Dilated_Outline']
-    index=0
-    for i in range(0, len(processing_methods)):
-        print("Processing Model " + processing_methods[i])
-        model_name='saved_models/' + processing_methods[i]+str(index)
-        model=''
-        if os.path.isdir(model_name):
-            model = load_model( model_name)
-        else:
-            model = mdl.createModel(processingMethod=processing_methods[i], model_index=index)
-        
-        X_test, y_test = mdl.loadDataset(processingMethod=processing_methods[i], dataChunkToLoad='test')
-        mdl.evaluateModel(model, X_test, y_test, processing_methods[i])
+    

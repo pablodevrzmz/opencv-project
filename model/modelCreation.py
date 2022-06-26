@@ -1,5 +1,6 @@
 from http.client import PRECONDITION_REQUIRED
 import numpy as np
+import pandas as pd
 import cv2 as cv
 import glob
 import os
@@ -8,6 +9,7 @@ from tensorflow.keras.applications import DenseNet121 as DN
 from tensorflow.keras import Sequential
 from sklearn import metrics
 from sklearn.preprocessing import LabelBinarizer
+from tensorflow.keras.models import load_model
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
 from tensorflow.keras.layers import Dense, Conv2D, MaxPooling2D, GlobalAveragePooling2D, Flatten, Dropout, BatchNormalization
@@ -92,22 +94,23 @@ def evaluateModel(model, X_test, y_test, title):
         if(predictions[i][0] == y_test[i][0] and predictions[i][1] == y_test[i][1] and predictions[i][2] == y_test[i][2]):
             correctly_predicted_images+=1
     
-    ROC = metrics.roc_auc_score(predictions, y_test)
-    accuracy = metrics.accuracy_score(predictions, y_test)
-    print('ROC score: ' + str(ROC))
-    print('accuracy method score: ' + str(accuracy))
     print('Correctly predicted images from the test set: '+str(correctly_predicted_images))
     print('Wrongfully predicted images from test set: '+ str(len(y_test)-correctly_predicted_images))
     print('Accuracy: ' + str(correctly_predicted_images/len(y_test)))
-    print('ROC AUC score:', getROCCurve(y_test, predictions))
-    plt.title(title)
-    plt.show()
+    
+    stats = []
+    stats.append(metrics.roc_auc_score(predictions, y_test, average='macro'))
+    stats.append(metrics.accuracy_score(predictions, y_test))
+    stats.append(metrics.f1_score(predictions, y_test, average='macro'))
+    stats.append(metrics.recall_score(predictions, y_test, average='macro'))
+    stats.append(metrics.precision_score(predictions, y_test, average='macro'))
+    return stats
 
-target=['rock','paper','scissors']
 
 
-def getROCCurve(y, predictions):
-    fig, c_ax = plt.subplots(1,1, figsize = (12, 8))
+def getROCCurve(y, predictions, fig_title):
+    target=['rock','paper','scissors']
+    _, c_ax = plt.subplots(1,1, figsize = (12, 8))
     lb = LabelBinarizer()
     lb.fit(y)
     y_test = lb.transform(y)
@@ -120,5 +123,41 @@ def getROCCurve(y, predictions):
     c_ax.legend()
     c_ax.set_xlabel('False Positive Rate')
     c_ax.set_ylabel('True Positive Rate')
-    return metrics.roc_auc_score(y_test, predictions, average='macro')
+    c_ax.set_title(fig_title)
+    plt.savefig('Extracted_Data/'+fig_title+'.png')
 
+
+def runModels():
+    processing_methods=['Unprocessed','InvertedColors','Outline','Contour', 'Blurred_Outline', 'Dilated_Outline']
+    models_ROC=[]
+    models_accuracy=[]
+    models_f1=[]
+    models_recall=[]
+    models_precision=[]
+    index=0
+    #Creating/Running each model.
+    for i in range(0, len(processing_methods)):
+        print("Processing Model " + processing_methods[i])
+        model_name='saved_models/' + processing_methods[i]+str(index)
+        model=''
+        if os.path.isdir(model_name):
+            model = load_model( model_name)
+        else:
+            model = createModel(processingMethod=processing_methods[i], model_index=index)
+        
+        X_test, y_test = loadDataset(processingMethod=processing_methods[i], dataChunkToLoad='test')
+        model_stats=evaluateModel(model, X_test, y_test, processing_methods[i])
+        models_ROC.append(model_stats[0])
+        models_accuracy.append(model_stats[1])
+        models_f1.append(model_stats[2])
+        models_recall.append(model_stats[3])
+        models_precision.append(model_stats[4])
+
+    #Creating the dataframe to store models' metrics
+    statistics = pd.DataFrame(processing_methods, columns=['Processing_Method'])
+    statistics['ROC'] = models_ROC
+    statistics['Accuracy'] = models_accuracy
+    statistics['F1 Score'] = models_f1
+    statistics['Recall'] = models_recall
+    statistics['Precision'] = models_precision
+    statistics.to_csv('Extracted_Data/models_scores.csv', index=False)
