@@ -47,6 +47,20 @@ def countourImage(imagePath):
 def outlineImage(imagePath):
     return thresholdImage(imagePath, color=0 ,adaptativeThreshMethod=cv.ADAPTIVE_THRESH_MEAN_C, blockSize=11, C=2)
 
+def blurredOutlineImage(imagePath):
+    img = outlineImage(imagePath)
+    return cv.GaussianBlur(img,(5,5),0)
+
+def erodedOutlineImage(imagePath):
+    img = outlineImage(imagePath)
+    kernel = np.ones((5, 5), np.uint8)
+    return cv.erode(img, kernel)
+
+def dilatedOutlineImage(imagePath):
+    img = outlineImage(imagePath)
+    kernel = np.ones((3, 3), np.uint8)
+    return cv.dilate(img, kernel)
+
 def saveImage(imagePath, imageData):
     cv.imwrite(imagePath, imageData)
 
