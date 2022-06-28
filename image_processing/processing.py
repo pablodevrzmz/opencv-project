@@ -13,11 +13,6 @@ def invertImageColors(imagePath):
     img = cv.imread(imagePath)
     return cv.bitwise_not(img)
 
-def upscaleImage(imagePath):
-    #Couldn't find it, resize?
-    print('do something')
-
-
 #https://docs.opencv.org/4.x/d7/d4d/tutorial_py_thresholding.html
 #types of thresholding
 #cv.THRESH_BINARY (default)

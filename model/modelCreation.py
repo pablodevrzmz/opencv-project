@@ -60,6 +60,7 @@ def loadDataset(processingMethod, dataChunkToLoad):
     return X, y
 
 
+# Model architecture taken from: https://www.kaggle.com/code/kamalkhumar/multiclass-classification-with-image-augmentation
 def createModel(processingMethod='Unprocessed', model_index=0):
     X_train, y_train = loadDataset(processingMethod, 'train')
     model_name=processingMethod+str(model_index)
@@ -108,7 +109,7 @@ def evaluateModel(model, X_test, y_test, title):
     return stats
 
 
-
+#This method was done based on an answer from here: https://stackoverflow.com/questions/66635552/keras-assessing-the-roc-auc-of-multiclass-cnn
 def getROCCurve(y, predictions, fig_title):
     target=['rock','paper','scissors']
     _, c_ax = plt.subplots(1,1, figsize = (12, 8))
